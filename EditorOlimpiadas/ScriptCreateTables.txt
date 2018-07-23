@@ -1,0 +1,8 @@
+CREATE TABLE tblOlimpiada( intIdOlimpiada INTEGER NOT NULL PRIMARY KEY, txtNombre TEXT NOT NULL UNIQUE )
+
+CREATE TABLE tblCuestionario( intID INTEGER NULL, txtPregunta TEXT NULL, txtVideo NVARCHAR NULL, txtEcuaciones NVARCHAR NULL, txtOtros NVARCHAR NULL, intIdCategoria INTEGER NOT NULL, txtCorrecta TEXT NOT NULL, intIdOlimpiada INTEGER NOT NULL, CHECK ((txtPregunta is not null) or (txtVideo is not null) or (txtEcuaciones is not null) or (txtOtros is not null) ) PRIMARY KEY (intID,intIdOlimpiada) FOREIGN KEY(intIdCategoria,intIdOlimpiada) REFERENCES TblCategoria(intIdCategoria,intIdOlimpiada) )
+
+
+CREATE TABLE tblCategoria( intIdCategoria INTEGER NOT NULL, txtNombreCategoria TEXT NOT NULL , intIdOlimpiada INTEGER NOT NULL , PRIMARY KEY(intIdCategoria,intIdOlimpiada), FOREIGN KEY(intIdOlimpiada) REFERENCES TblOlimpiada(intIdOlimpiada) )
+
+CREATE TABLE TblRepuestaErronea( intID INTEGER NOT NULL PRIMARY KEY, intIdOlimpiada INTEGER NOT NULL, txtRespuesta1 TEXT NOT NULL, txtRespuesta2 TEXT NOT NULL, txtRespuesta3 TEXT NOT NULL, FOREIGN KEY(intIdOlimpiada,intID) REFERENCES TblCuestionario(intIdOlimpiada,intID) )
