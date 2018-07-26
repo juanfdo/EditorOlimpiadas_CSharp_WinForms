@@ -224,10 +224,122 @@ namespace EditorOlimpiadas
 
             }
         }
-
+        public class ConjuntoRBtnTBox
+        {
+            public RadioButton rBtn;
+            public TextBox tBox;
+        }
         private void btnSave_Click(object sender, EventArgs e)
         {
-            SQLiteCommand sqlCmd = this.conexion_sqlite.CreateCommand();
+            SQLiteConnection cnxSqlite = null;
+            Int32 cuestionId = 0;
+            string strRespuestaOK = null;
+            Int32 intCat = 0, intOlimpiada = 0;
+            List<string> strRespuestaErr = new List<string>();
+            SQLiteDataReader reader = null;
+            SQLiteCommand sqlCmd = null;
+            string strInsertarCuestionario = null;
+            string strInsertarRespuestasErr = null;
+            string strPregunta;
+
+            ConjuntoRBtnTBox[] conjunto = {
+                new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion1, tBox = txtOp1 },
+                new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion2, tBox = txtOp2 },
+                new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion3, tBox = txtOp3 },
+                new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion4, tBox = txtOp4 }
+            };//, rBtnOpcion2, rBtnOpcion3, rBtnOpcion4 };
+            try
+            {
+                cnxSqlite = this.conexion_sqlite.OpenAndReturn();
+                sqlCmd = this.conexion_sqlite.CreateCommand();
+
+                //TODO: Validar el tipo de pregunta: Texto, Video, Ecuaciones, otros
+                strInsertarCuestionario = "INSERT INTO tblCuestionario(" +
+                    "    txtPregunta," +
+                    "    txtVideo," +
+                    "    txtEcuaciones," +
+                    "    txtOtros," +
+                    "    txtCorrecta," +
+                    "    intIdCategoria," +
+                    "    intIdOlimpiada" +
+                    ") VALUES(" +
+                    "    '{0}'," +
+                    "    null," +
+                    "    null," +
+                    "    null," +
+                    "    '{1}'," +
+                    "    {2}," +
+                    "    {3}" +
+                    ");" +
+                    "SELECT last_insert_rowid();";
+                strInsertarRespuestasErr = "INSERT INTO tblRepuestaErronea(" +
+                    "   intID," +
+                    "	txtRespuesta1," +
+                    "	txtRespuesta2," +
+                    "	txtRespuesta3" +
+                    ")VALUES(" +
+                    "    {0}," +
+                    "    {1}," +
+                    "    {2}," +
+                    "    {3}" +
+                    ");";
+
+                strPregunta = this.txtPregunta.Text;
+                if (strPregunta == null)
+                    return;//TODO: trow exception
+                if (strPregunta.Length <= 0)
+                    return;//TODO: trow exception
+
+                if (cbCategoria.SelectedIndex > 0)
+                    intCat = ((Int32)cbCategoria.SelectedValue);
+                if (cbOlimpiada.SelectedIndex > 0)
+                    intOlimpiada = ((Int32)cbOlimpiada.SelectedValue);
+
+                foreach (ConjuntoRBtnTBox elm in conjunto)
+                {
+                    if (elm.rBtn.Checked)
+                    {
+                        strRespuestaOK = elm.tBox.Text;
+                    }
+                    else
+                    {
+                        strRespuestaErr.Add(elm.tBox.Text);
+                    }
+                }
+
+                strInsertarCuestionario = String.Format(strInsertarCuestionario, strPregunta, strRespuestaOK, intCat, intOlimpiada);
+                sqlCmd.CommandText = strInsertarCuestionario;
+                reader = sqlCmd.ExecuteReader();
+                cuestionId = -1;
+                while (reader.Read())
+                {
+                    cuestionId = reader.GetInt32(0);
+                }
+                reader.Close();
+                if(cuestionId >= 0)
+                {
+                    strInsertarRespuestasErr = String.Format(strInsertarRespuestasErr, cuestionId, strRespuestaErr.ElementAt(0), strRespuestaErr.ElementAt(1), strRespuestaErr.ElementAt(2));
+                    sqlCmd.CommandText = strInsertarCuestionario;
+                    reader = sqlCmd.ExecuteReader();
+                    if(reader.FieldCount == 0)
+                    {
+                        //TODO: error en la insercion de las respuestas erroneas.
+                    }
+                    reader.Close();
+                }
+            }
+            catch (Exception exc)
+            {
+                MessageBox.Show(exc.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                //TODO: Establecer procedimiento de finallización
+                if (reader != null)
+                    reader.Close();
+                if (cnxSqlite != null)
+                    cnxSqlite.Close();
+            }
         }
 
         private void btAgregarOlimpiada_Click(object sender, EventArgs e)
@@ -321,12 +433,25 @@ INSERT INTO tblCuestionario(
 	intIdCategoria,
 	intIdOlimpiada
 ) VALUES (
-	"TEXTO DE LA PREGUNTA",
+	'{0}',
 	null,
 	null,
 	null,
-	"Respuesta correcta",
-	1,
-	1
+	'{1}',
+	{2},
+	{3}
+);
+SELECT last_insert_rowid();
+
+INSERT INTO tblRepuestaErronea(
+	intID,
+	txtRespuesta1,
+	txtRespuesta2,
+	txtRespuesta3
+)VALUES(
+    {0},
+    {1},
+    {2},
+    {3}
 );
 */
