@@ -273,16 +273,12 @@ namespace EditorOlimpiadas
                     ");" +
                     "SELECT last_insert_rowid();";
                 strInsertarRespuestasErr = "INSERT INTO tblRepuestaErronea(" +
-                    "   intID," +
-                    "	txtRespuesta1," +
-                    "	txtRespuesta2," +
-                    "	txtRespuesta3" +
+                    "intID," +
+                    "txtRespuesta1," +
+                    "txtRespuesta2," +
+                    "txtRespuesta3" +
                     ")VALUES(" +
-                    "    {0}," +
-                    "    {1}," +
-                    "    {2}," +
-                    "    {3}" +
-                    ");";
+                    "{0},'{1}','{2}','{3}');";
 
                 strPregunta = this.txtPregunta.Text;
                 if (strPregunta == null)
@@ -321,7 +317,7 @@ namespace EditorOlimpiadas
                     strInsertarRespuestasErr = String.Format(strInsertarRespuestasErr, cuestionId, strRespuestaErr.ElementAt(0), strRespuestaErr.ElementAt(1), strRespuestaErr.ElementAt(2));
                     sqlCmd.CommandText = strInsertarCuestionario;
                     reader = sqlCmd.ExecuteReader();
-                    if(reader.FieldCount == 0)
+                    if(reader.RecordsAffected < 1)
                     {
                         //TODO: error en la insercion de las respuestas erroneas.
                     }
