@@ -1,8 +1,56 @@
-CREATE TABLE tblOlimpiada( intIdOlimpiada INTEGER NOT NULL PRIMARY KEY, txtNombre TEXT NOT NULL UNIQUE )
+CREATE TABLE tblOlimpiada(
+	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+--	intIdOlimpiada INTEGER NOT NULL PRIMARY KEY,
+	txtNombre TEXT NOT NULL UNIQUE
+);
 
-CREATE TABLE tblCuestionario( intID INTEGER NULL, txtPregunta TEXT NULL, txtVideo NVARCHAR NULL, txtEcuaciones NVARCHAR NULL, txtOtros NVARCHAR NULL, intIdCategoria INTEGER NOT NULL, txtCorrecta TEXT NOT NULL, intIdOlimpiada INTEGER NOT NULL, CHECK ((txtPregunta is not null) or (txtVideo is not null) or (txtEcuaciones is not null) or (txtOtros is not null) ) PRIMARY KEY (intID,intIdOlimpiada) FOREIGN KEY(intIdCategoria,intIdOlimpiada) REFERENCES TblCategoria(intIdCategoria,intIdOlimpiada) )
+CREATE TABLE tblCategoria(
+	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+--	intIdCategoria INTEGER NOT NULL,
+	txtNombre TEXT NOT NULL UNIQUE
+--	intIdOlimpiada INTEGER NOT NULL,
+--	PRIMARY KEY(intIdCategoria,intIdOlimpiada),
+--	FOREIGN KEY(intIdOlimpiada) REFERENCES TblOlimpiada(intID)
+);
+
+CREATE TABLE tblCuestionario( 
+	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+--	intID INTEGER NULL,
+	txtPregunta TEXT NULL,
+	txtVideo NVARCHAR NULL,
+	txtEcuaciones NVARCHAR NULL,
+	txtOtros NVARCHAR NULL,
+	txtCorrecta TEXT NOT NULL,
+	intIdCategoria INTEGER NOT NULL,
+	intIdOlimpiada INTEGER NOT NULL,
+--	CHECK ((txtPregunta is not null) or (txtVideo is not null) or (txtEcuaciones is not null) or (txtOtros is not null) ),
+--	PRIMARY KEY (intID,intIdOlimpiada),
+	FOREIGN KEY(intIdCategoria) REFERENCES tblCategoria(intID)
+	FOREIGN KEY(intIdOlimpiada) REFERENCES tblOlimpiada(intID)
+);
 
 
-CREATE TABLE tblCategoria( intIdCategoria INTEGER NOT NULL, txtNombreCategoria TEXT NOT NULL , intIdOlimpiada INTEGER NOT NULL , PRIMARY KEY(intIdCategoria,intIdOlimpiada), FOREIGN KEY(intIdOlimpiada) REFERENCES TblOlimpiada(intIdOlimpiada) )
+CREATE TABLE tblRepuestaErronea(
+	intID INTEGER NOT NULL PRIMARY KEY,
+--	intIdOlimpiada INTEGER NOT NULL,
+	txtRespuesta1 TEXT NOT NULL,
+	txtRespuesta2 TEXT NOT NULL,
+	txtRespuesta3 TEXT NOT NULL,
+	FOREIGN KEY(intID) REFERENCES tblCuestionario(intID)
+);
 
-CREATE TABLE TblRepuestaErronea( intID INTEGER NOT NULL PRIMARY KEY, intIdOlimpiada INTEGER NOT NULL, txtRespuesta1 TEXT NOT NULL, txtRespuesta2 TEXT NOT NULL, txtRespuesta3 TEXT NOT NULL, FOREIGN KEY(intIdOlimpiada,intID) REFERENCES TblCuestionario(intIdOlimpiada,intID) )
+CREATE VIEW IF NOT EXISTS viewCuestionario AS
+SELECT tblCuestionario.intID as intID,
+  tblCuestionario.txtCorrecta as txtCorrecta,
+  tblCuestionario.txtEcuaciones as txtEcuaciones,
+  tblCuestionario.txtOtros as txtOtros,
+  tblCuestionario.txtPregunta as txtPregunta,
+  tblCuestionario.txtVideo as txtVideo,
+  tblRepuestaErronea.txtRespuesta1 as txtRespuesta1,
+  tblRepuestaErronea.txtRespuesta2 as txtRespuesta2,
+  tblRepuestaErronea.txtRespuesta3 as txtRespuesta3
+FROM
+  tblCuestionario,
+  tblRepuestaErronea
+where
+  tblCuestionario.intID == tblRepuestaErronea.intID;

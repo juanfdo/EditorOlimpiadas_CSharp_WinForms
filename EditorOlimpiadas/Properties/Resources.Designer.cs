@@ -89,5 +89,30 @@ namespace EditorOlimpiadas.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a CREATE TABLE tblOlimpiada(
+        ///	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        ///--	intIdOlimpiada INTEGER NOT NULL PRIMARY KEY,
+        ///	txtNombre TEXT NOT NULL UNIQUE
+        ///);
+        ///
+        ///CREATE TABLE tblCategoria(
+        ///	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        ///--	intIdCategoria INTEGER NOT NULL,
+        ///	txtNombreCategoria TEXT NOT NULL,
+        ///	intIdOlimpiada INTEGER NOT NULL,
+        ///--	PRIMARY KEY(intIdCategoria,intIdOlimpiada),
+        ///	FOREIGN KEY(intIdOlimpiada) REFERENCES TblOlimpiada(intID)
+        ///);
+        ///
+        ///CREATE TABLE tblCuestionario( 
+        ///	intID IN [resto de la cadena truncado]&quot;;.
+        /// </summary>
+        internal static string ScriptCreateTables {
+            get {
+                return ResourceManager.GetString("ScriptCreateTables", resourceCulture);
+            }
+        }
     }
 }

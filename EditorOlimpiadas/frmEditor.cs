@@ -7,27 +7,60 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Finisar.SQLite;
+using System.Data.SQLite;
+using System.Collections;
+//using Finisar.SQLite;
 
 namespace EditorOlimpiadas
 {
     public partial class frmEditor : Form
     {
         public string ruta;
+        private SQLiteConnection conexion_sqlite = null;
+
+        const string strTblCategoria = "tblCategoria";
+        const string strTblOlimpiada = "tblOlimpiada";
+        const string strTblCuestionario = "tblCuestionario";
+        const string strTblRespuestaErronea = "tblRepuestaErronea";
+
+        //public SQLiteConnection conexion_sqlite { get; private set; }
+        private void SetConnection(String filePath)
+        {
+            ArrayList tablas = new ArrayList();
+            tablas.Add(strTblOlimpiada);
+            tablas.Add(strTblCategoria);
+            tablas.Add(strTblCuestionario);
+            tablas.Add(strTblRespuestaErronea);
+
+            String conString = String.Format("Data Source={0};Version=3;New=False;Compress=True;", filePath);
+            try
+            {
+                conexion_sqlite = new SQLiteConnection(conString);
+                llenarComboBox(this.cbOlimpiada, strTblOlimpiada);
+                llenarComboBox(this.cbCategoria, strTblCategoria);
+                //conexion_sqlite.Open();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         public frmEditor()
         {
             InitializeComponent();
-            
+
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog buscarBD = new OpenFileDialog();
-            buscarBD.Filter = "DB Files (.sqlite)|*.sqlite";
+            buscarBD.Filter = "Archivos sqlite (.sqlite)|*.sqlite|Archivos DB (.db)|*.db";
             if (buscarBD.ShowDialog() == DialogResult.OK)
             {
                 //EditorOlimpiadas.CBD.sqConnectionString = "DataSource=" + buscarBD.FileName;
                 //CBD.contadorRegistro();
+                SetConnection(buscarBD.FileName);
             }
         }
 
@@ -62,7 +95,8 @@ namespace EditorOlimpiadas
         private void btnOpenDB_Click(object sender, EventArgs e)
         {
             //Crear una nueva Base de Datos
-            CrearBD();
+            //CrearBD();
+            abrirToolStripMenuItem_Click(null, null);
         }
 
         private void CrearBD()
@@ -82,46 +116,35 @@ namespace EditorOlimpiadas
                 if (folderPath != string.Empty)
                 {
                     //Utilizamos estos tres objetos de SQLite
-                    SQLiteConnection conexion_sqlite;
+                    //SQLiteConnection conexion_sqlite;
                     SQLiteCommand cmd_sqlite;
+                    string strQuery;
                     // SQLiteDataReader datareader_sqlite;
                     //Crear una nueva conexión de la base de datos
-                    conexion_sqlite = new SQLiteConnection("Data Source=" + folderPath + "\\database.db;Version=3;New=True;Compress=True;");
+                    conexion_sqlite = new SQLiteConnection("Data Source=" + folderPath + "\\database.sqlite;Version=3;New=True;Compress=True;");
                     conexion_sqlite.Open();
+
                     cmd_sqlite = conexion_sqlite.CreateCommand();
-                    cmd_sqlite.CommandText = "CREATE TABLE tblOlimpiada( intIdOlimpiada INTEGER NOT NULL PRIMARY KEY, txtNombre TEXT NOT NULL UNIQUE);";
+                    strQuery = Properties.Resources.ScriptCreateTables;
+                    cmd_sqlite.CommandText = strQuery;
                     cmd_sqlite.ExecuteNonQuery();
 
-                    cmd_sqlite.CommandText = "CREATE TABLE tblCuestionario( intID INTEGER NULL, txtPregunta TEXT NULL, txtVideo NVARCHAR NULL, txtEcuaciones NVARCHAR NULL, txtOtros NVARCHAR NULL, intIdCategoria INTEGER NOT NULL, txtCorrecta TEXT NOT NULL, intIdOlimpiada INTEGER NOT NULL, CHECK ((txtPregunta is not null) or (txtVideo is not null) or (txtEcuaciones is not null) or (txtOtros is not null) ) PRIMARY KEY (intID,intIdOlimpiada) FOREIGN KEY(intIdCategoria,intIdOlimpiada) REFERENCES TblCategoria(intIdCategoria,intIdOlimpiada) );";
-                    cmd_sqlite.ExecuteNonQuery();
-
-                    cmd_sqlite.CommandText = "CREATE TABLE tblCategoria( intIdCategoria INTEGER NOT NULL, txtNombreCategoria TEXT NOT NULL , intIdOlimpiada INTEGER NOT NULL , PRIMARY KEY(intIdCategoria,intIdOlimpiada), FOREIGN KEY(intIdOlimpiada) REFERENCES TblOlimpiada(intIdOlimpiada) );";
-                    cmd_sqlite.ExecuteNonQuery();
-
-                    cmd_sqlite.CommandText = "CREATE TABLE TblRepuestaErronea( intID INTEGER NOT NULL PRIMARY KEY, intIdOlimpiada INTEGER NOT NULL, txtRespuesta1 TEXT NOT NULL, txtRespuesta2 TEXT NOT NULL, txtRespuesta3 TEXT NOT NULL, FOREIGN KEY(intIdOlimpiada,intID) REFERENCES TblCuestionario(intIdOlimpiada,intID) );";
-                    cmd_sqlite.ExecuteNonQuery();
-
-                    //Insertando datos en la tabla
-                    //cmd_sqlite.CommandText = "INSERT INTO demo(id, texto) VALUES (1, 'Este es el primer texto');";
-                    //cmd_sqlite.ExecuteNonQuery();
-                    //cmd_sqlite.CommandText = "INSERT INTO demo(id, texto) VALUES (2, 'Este es el segundo texto');";
-                    //cmd_sqlite.ExecuteNonQuery();
                     this.Text = folderPath;
                     MessageBox.Show("Base de datos creada exitosamente!");
                     conexion_sqlite.Close();
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
 
-                MessageBox.Show("Error al intentar crear la base de datos");
+                MessageBox.Show(e.Message);
             }
 
         }
 
         //private void btnOpenMedia_Click(object sender, EventArgs e)
         //{
-           
+
         //}
 
         private void picEqP_Click(object sender, EventArgs e)
@@ -184,21 +207,126 @@ namespace EditorOlimpiadas
                 txtMediaPath.Text = openFileDialog1.FileName;
                 string extension = txtMediaPath.Text.ToUpper();
                 String[] extension2 = extension.Split('.');
-                MessageBox.Show(extension2[2]);
-                if (extension2[2] == "BMP" || extension2[2] == "JPG" || extension2[2] == "PNG")
+                MessageBox.Show(extension2[1]);
+                int extIndex = extension2.Length - 1;
+                if (extension2[extIndex] == "BMP" || extension2[extIndex] == "JPG" || extension2[extIndex] == "PNG")
                 {
                     picPregunta.ImageLocation = openFileDialog1.FileName;
                 }
-                if (extension2[2] == "AVI" || extension2[2] == "MP4" || extension2[2] == "?")
+                if (extension2[extIndex] == "AVI" || extension2[extIndex] == "MP4" || extension2[extIndex] == "?")
                 {
 
                 }
-                if (extension2[2] == "WAV" || extension2[2] == "MP3" )
+                if (extension2[extIndex] == "WAV" || extension2[1] == "MP3")
                 {
 
                 }
 
             }
         }
-    }   
+
+        private void btnSave_Click(object sender, EventArgs e)
+        {
+            SQLiteCommand sqlCmd = this.conexion_sqlite.CreateCommand();
+        }
+
+        private void btAgregarOlimpiada_Click(object sender, EventArgs e)
+        {
+            insertarNombre(strTblOlimpiada, tbAgregarOlimpiada.Text);
+            llenarComboBox(cbOlimpiada, strTblOlimpiada);
+            tbAgregarOlimpiada.Text = "";
+        }
+        private void btAgregarCategoria_Click(object sender, EventArgs e)
+        {
+            insertarNombre(strTblCategoria, tbAgregarCategoria.Text);
+            llenarComboBox(cbCategoria, strTblCategoria);
+            tbAgregarCategoria.Text = "";
+        }
+
+        private void insertarNombre(String strTabla, String strTexto)
+        {
+            SQLiteConnection cnxSqlite = null;
+            try
+            {
+                String strQuery = String.Format("INSERT INTO {0}(txtNombre) VALUES('{1}');", strTabla, strTexto);
+                cnxSqlite = conexion_sqlite.OpenAndReturn();
+                SQLiteCommand cmdSqlite = cnxSqlite.CreateCommand();
+                cmdSqlite.CommandText = strQuery;
+                cmdSqlite.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (cnxSqlite != null)
+                    cnxSqlite.Close();
+            }
+        }
+        private void llenarComboBox(ComboBox cb, string tabla)
+        {
+            SQLiteConnection cnxSqlite = null;
+            try
+            {
+                cnxSqlite = conexion_sqlite.OpenAndReturn();
+                SQLiteCommand cmdSqlite = cnxSqlite.CreateCommand();
+                cmdSqlite.CommandText = String.Format("SELECT intID, txtNombre FROM {0}", tabla);
+                SQLiteDataReader reader = cmdSqlite.ExecuteReader();
+                List<Nombre> nombres = new List<Nombre>();
+                Nombre nombre;
+
+                while (reader.Read())
+                {
+                    nombre = new Nombre()
+                    {
+                        id = reader.GetInt32(0),
+                        texto = reader.GetString(1)
+                    };
+                    nombres.Add(nombre);
+                }
+                cb.DataSource = nombres;
+                cb.DisplayMember = "texto";
+                cb.ValueMember = "id";
+                cb.DropDownStyle = ComboBoxStyle.DropDownList;
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                if (cnxSqlite != null)
+                    cnxSqlite.Close();
+            }
+        }
+    }
+    public class Nombre
+    {
+        public string texto { get; set; }
+        public Int32 id { get; set; }
+    }
 }
+
+/*
+INSERT INTO tblOlimpiada(txtNombre) VALUES ('2018-2');
+INSERT INTO tblCategoria(txtNombre) VALUES ('Cat1');
+
+INSERT INTO tblCuestionario( 
+	txtPregunta,
+	txtVideo,
+	txtEcuaciones,
+	txtOtros,
+	txtCorrecta,
+	intIdCategoria,
+	intIdOlimpiada
+) VALUES (
+	"TEXTO DE LA PREGUNTA",
+	null,
+	null,
+	null,
+	"Respuesta correcta",
+	1,
+	1
+);
+*/
