@@ -1,21 +1,57 @@
+BEGIN TRANSACTION;
+PRAGMA foreign_keys = OFF;
+
+CREATE TABLE tblUsuario(
+	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	txtNombre TEXT NOT NULL UNIQUE
+--	intRol INTEGER NOT NULL DEFAULT 1 REFERENCES rol(intId),
+--	txtPassword TEXT NOT NULL
+);
+INSERT INTO tblUsuario(intId, txtNombre) VALUES (1, 'root');
+
+CREATE TABLE tblConfiguracion(
+	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	txtKey TEXT NOT NULL UNIQUE,
+	txtValue TEXT NOT NULL,
+	txtDescripcion TEXT NOY NULL,
+	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
+);
+INSERT INTO tblConfiguracion(txtKey,txtValue,txtDescripcion)values('ver','0.0.1','Version de la base de datos');
+
 CREATE TABLE tblOlimpiada(
 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
---	intIdOlimpiada INTEGER NOT NULL PRIMARY KEY,
-	txtNombre TEXT NOT NULL UNIQUE
+	txtNombre TEXT NOT NULL UNIQUE,
+	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
 );
 
 CREATE TABLE tblCategoria(
 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
---	intIdCategoria INTEGER NOT NULL,
-	txtNombre TEXT NOT NULL UNIQUE
---	intIdOlimpiada INTEGER NOT NULL,
---	PRIMARY KEY(intIdCategoria,intIdOlimpiada),
---	FOREIGN KEY(intIdOlimpiada) REFERENCES TblOlimpiada(intID)
+	txtNombre TEXT NOT NULL UNIQUE,
+	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
 );
+
+-- https://www.sqlite.org/intern-v-extern-blob.html
+-- CREATE TABLE tblMediaFile(
+-- 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+-- 	pathRelativo BOOLEAN NOT NULL DEFAULT 1,
+-- 	web BOOLEAN NOT NULL DEFAULT 0,
+-- 	path NVARCHAR NOT NULL UNIQUE,
+--	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+--	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
+-- 	);
+-- https://www.sqlite.org/intern-v-extern-blob.html
+-- CREATE TABLE tblMediaBLOB(
+-- 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+-- 	data BLOB NOT NULL,
+--	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+--	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
+-- );
 
 CREATE TABLE tblCuestionario( 
 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
---	intID INTEGER NULL,
 	txtPregunta TEXT NULL,
 	txtVideo NVARCHAR NULL,
 	txtEcuaciones NVARCHAR NULL,
@@ -23,19 +59,21 @@ CREATE TABLE tblCuestionario(
 	txtCorrecta TEXT NOT NULL,
 	intIdCategoria INTEGER NOT NULL,
 	intIdOlimpiada INTEGER NOT NULL,
+	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId),
 --	CHECK ((txtPregunta is not null) or (txtVideo is not null) or (txtEcuaciones is not null) or (txtOtros is not null) ),
---	PRIMARY KEY (intID,intIdOlimpiada),
 	FOREIGN KEY(intIdCategoria) REFERENCES tblCategoria(intID)
 	FOREIGN KEY(intIdOlimpiada) REFERENCES tblOlimpiada(intID)
 );
 
 
-CREATE TABLE tblRepuestaErronea(
+CREATE TABLE tblRespuestaErronea(
 	intID INTEGER NOT NULL PRIMARY KEY,
---	intIdOlimpiada INTEGER NOT NULL,
 	txtRespuesta1 TEXT NOT NULL,
 	txtRespuesta2 TEXT NOT NULL,
 	txtRespuesta3 TEXT NOT NULL,
+	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId),
 	FOREIGN KEY(intID) REFERENCES tblCuestionario(intID)
 );
 
@@ -46,11 +84,14 @@ SELECT tblCuestionario.intID as intID,
   tblCuestionario.txtOtros as txtOtros,
   tblCuestionario.txtPregunta as txtPregunta,
   tblCuestionario.txtVideo as txtVideo,
-  tblRepuestaErronea.txtRespuesta1 as txtRespuesta1,
-  tblRepuestaErronea.txtRespuesta2 as txtRespuesta2,
-  tblRepuestaErronea.txtRespuesta3 as txtRespuesta3
+  tblRespuestaErronea.txtRespuesta1 as txtRespuesta1,
+  tblRespuestaErronea.txtRespuesta2 as txtRespuesta2,
+  tblRespuestaErronea.txtRespuesta3 as txtRespuesta3
 FROM
   tblCuestionario,
-  tblRepuestaErronea
+  tblRespuestaErronea
 where
-  tblCuestionario.intID == tblRepuestaErronea.intID;
+  tblCuestionario.intID == tblRespuestaErronea.intID;
+
+PRAGMA foreign_keys = ON;
+COMMIT;

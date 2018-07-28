@@ -93,25 +93,41 @@ namespace EditorOlimpiadas.Properties {
         /// <summary>
         ///   Busca una cadena traducida similar a CREATE TABLE tblOlimpiada(
         ///	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        ///--	intIdOlimpiada INTEGER NOT NULL PRIMARY KEY,
         ///	txtNombre TEXT NOT NULL UNIQUE
         ///);
         ///
         ///CREATE TABLE tblCategoria(
         ///	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        ///--	intIdCategoria INTEGER NOT NULL,
-        ///	txtNombreCategoria TEXT NOT NULL,
-        ///	intIdOlimpiada INTEGER NOT NULL,
-        ///--	PRIMARY KEY(intIdCategoria,intIdOlimpiada),
-        ///	FOREIGN KEY(intIdOlimpiada) REFERENCES TblOlimpiada(intID)
+        ///	txtNombre TEXT NOT NULL UNIQUE
         ///);
         ///
-        ///CREATE TABLE tblCuestionario( 
-        ///	intID IN [resto de la cadena truncado]&quot;;.
+        ///-- https://www.sqlite.org/intern-v-extern-blob.html
+        ///-- CREATE TABLE tblMediaFile(
+        ///-- 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        ///-- 	pathRelativo BOOLEAN NOT NULL DEFAULT 1,
+        ///-- 	web BOOLEAN NOT NULL DEFAULT 0,
+        ///-- 	path NVARCHAR NOT NULL UNIQUE
+        ///-- 	);
+        ///-- https: [resto de la cadena truncado]&quot;;.
         /// </summary>
         internal static string ScriptCreateTables {
             get {
                 return ResourceManager.GetString("ScriptCreateTables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a INSERT INTO tblCuestionario(txtPregunta, txtVideo, txtEcuaciones, txtOtros, txtCorrecta, intIdCategoria, intIdOlimpiada)
+        ///  VALUES(&apos;{0}&apos;, null, null, null, &apos;{1}&apos;, {2}, {3});
+        ///--  SELECT last_insert_rowid();
+        ///INSERT INTO tblRepuestaErronea(intID, txtRespuesta1, txtRespuesta2, txtRespuesta3)
+        ///  SELECT last_insert_rowid(), &apos;{4}&apos;, &apos;{5}&apos;, &apos;{6}&apos;;
+        ///
+        ///--  VALUES({0},&apos;{1}&apos;,&apos;{2}&apos;,&apos;{3}&apos;);.
+        /// </summary>
+        internal static string ScriptInsertaPregunta {
+            get {
+                return ResourceManager.GetString("ScriptInsertaPregunta", resourceCulture);
             }
         }
     }

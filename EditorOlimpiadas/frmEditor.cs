@@ -21,8 +21,20 @@ namespace EditorOlimpiadas
         const string strTblCategoria = "tblCategoria";
         const string strTblOlimpiada = "tblOlimpiada";
         const string strTblCuestionario = "tblCuestionario";
-        const string strTblRespuestaErronea = "tblRepuestaErronea";
+        const string strTblRespuestaErronea = "tblRespuestaErronea";
+        List<Control> activarDesactivarControles = null;
+        List<ToolStripItem> activarDesactivarToolStripItems = null;
 
+        //Int32 cuestionId = -1;
+        private Int32 __CUESTION_ID_ = -1;
+        public Int32 cuestionId
+        {
+            set {
+                __CUESTION_ID_ = value;
+                txtPreguntaId.Text = "" + __CUESTION_ID_;
+            }
+            get { return __CUESTION_ID_; }
+        }
         //public SQLiteConnection conexion_sqlite { get; private set; }
         private void SetConnection(String filePath)
         {
@@ -38,6 +50,8 @@ namespace EditorOlimpiadas
                 conexion_sqlite = new SQLiteConnection(conString);
                 llenarComboBox(this.cbOlimpiada, strTblOlimpiada);
                 llenarComboBox(this.cbCategoria, strTblCategoria);
+                ActivarEdicion();
+                cargarPrimeraPregunta();
                 //conexion_sqlite.Open();
             }
             catch (Exception e)
@@ -46,10 +60,63 @@ namespace EditorOlimpiadas
             }
         }
 
+        private void cargarPrimeraPregunta()
+        {
+            string query = "SELECT * FROM viewCuestionario LIMIT 1;";
+            SQLiteConnection cnxSqlite = conexion_sqlite.OpenAndReturn();
+            SQLiteCommand cmdSqlite = cnxSqlite.CreateCommand();
+            cmdSqlite.CommandText = query;
+            SQLiteDataReader reader = cmdSqlite.ExecuteReader();
+            if (reader.Read())
+            {
+                cuestionId = reader.GetInt32(0);
+                this.txtPregunta.Text = reader.GetString(4);
+                this.txtOp1.Text = reader.GetString(1);
+                this.txtOp2.Text = reader.GetString(6);
+                this.txtOp3.Text = reader.GetString(7);
+                this.txtOp4.Text = reader.GetString(8);
+            }
+            else
+            {
+                //TODO: No hay registros en la Base de datos
+            }
+            reader.Close();
+            cnxSqlite.Close();
+        }
+
         public frmEditor()
         {
             InitializeComponent();
 
+            if (activarDesactivarControles == null)
+            {
+                activarDesactivarControles = new List<Control>();
+                activarDesactivarControles.Add(this.txtPregunta);
+                activarDesactivarControles.Add(this.txtOp1);
+                activarDesactivarControles.Add(this.txtOp2);
+                activarDesactivarControles.Add(this.txtOp3);
+                activarDesactivarControles.Add(this.txtOp4);
+                activarDesactivarControles.Add(this.tbAgregarCategoria);
+                activarDesactivarControles.Add(this.tbAgregarOlimpiada);
+                activarDesactivarControles.Add(this.btnOpenMedia);
+                activarDesactivarControles.Add(this.rBtnOpcion1);
+                activarDesactivarControles.Add(this.rBtnOpcion2);
+                activarDesactivarControles.Add(this.rBtnOpcion3);
+                activarDesactivarControles.Add(this.rBtnOpcion4);
+            }
+            if (activarDesactivarToolStripItems == null)
+            {
+                activarDesactivarToolStripItems = new List<ToolStripItem>();
+                activarDesactivarToolStripItems.Add(this.btnCloseDB);
+                activarDesactivarToolStripItems.Add(this.btnDelQ);
+                activarDesactivarToolStripItems.Add(this.btnBack);
+                activarDesactivarToolStripItems.Add(this.btnFirst);
+                activarDesactivarToolStripItems.Add(this.btnLast);
+                activarDesactivarToolStripItems.Add(this.btnNewQ);
+                activarDesactivarToolStripItems.Add(this.btnNext);
+                activarDesactivarToolStripItems.Add(this.btnSave);
+            }
+            DesActivarEdicion();
         }
 
         private void abrirToolStripMenuItem_Click(object sender, EventArgs e)
@@ -58,8 +125,6 @@ namespace EditorOlimpiadas
             buscarBD.Filter = "Archivos sqlite (.sqlite)|*.sqlite|Archivos DB (.db)|*.db";
             if (buscarBD.ShowDialog() == DialogResult.OK)
             {
-                //EditorOlimpiadas.CBD.sqConnectionString = "DataSource=" + buscarBD.FileName;
-                //CBD.contadorRegistro();
                 SetConnection(buscarBD.FileName);
             }
         }
@@ -101,10 +166,12 @@ namespace EditorOlimpiadas
 
         private void CrearBD()
         {
+            SQLiteCommand cmd_sqlite = null;
+            string strQuery;
+            string folderPath = string.Empty;
+
             try
             {
-
-                string folderPath = string.Empty;
                 using (FolderBrowserDialog fdb = new FolderBrowserDialog())
                 {
                     if (fdb.ShowDialog() == DialogResult.OK)
@@ -117,8 +184,6 @@ namespace EditorOlimpiadas
                 {
                     //Utilizamos estos tres objetos de SQLite
                     //SQLiteConnection conexion_sqlite;
-                    SQLiteCommand cmd_sqlite;
-                    string strQuery;
                     // SQLiteDataReader datareader_sqlite;
                     //Crear una nueva conexión de la base de datos
                     conexion_sqlite = new SQLiteConnection("Data Source=" + folderPath + "\\database.sqlite;Version=3;New=True;Compress=True;");
@@ -132,20 +197,26 @@ namespace EditorOlimpiadas
                     this.Text = folderPath;
                     MessageBox.Show("Base de datos creada exitosamente!");
                     conexion_sqlite.Close();
+                    cmd_sqlite = null;
+
+                    ActivarEdicion();
                 }
+            }
+            catch (SQLiteException ex)
+            {
+                if (cmd_sqlite != null)
+                {
+                    cmd_sqlite.CommandText = "ROLLBACK;";
+                    cmd_sqlite.ExecuteNonQuery();
+                }
+                new Exception(ex.Message,ex);
             }
             catch (Exception e)
             {
-
                 MessageBox.Show(e.Message);
             }
 
         }
-
-        //private void btnOpenMedia_Click(object sender, EventArgs e)
-        //{
-
-        //}
 
         private void picEqP_Click(object sender, EventArgs e)
         {
@@ -232,14 +303,12 @@ namespace EditorOlimpiadas
         private void btnSave_Click(object sender, EventArgs e)
         {
             SQLiteConnection cnxSqlite = null;
-            Int32 cuestionId = 0;
             string strRespuestaOK = null;
             Int32 intCat = 0, intOlimpiada = 0;
             List<string> strRespuestaErr = new List<string>();
             SQLiteDataReader reader = null;
             SQLiteCommand sqlCmd = null;
             string strInsertarCuestionario = null;
-            string strInsertarRespuestasErr = null;
             string strPregunta;
 
             ConjuntoRBtnTBox[] conjunto = {
@@ -247,49 +316,36 @@ namespace EditorOlimpiadas
                 new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion2, tBox = txtOp2 },
                 new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion3, tBox = txtOp3 },
                 new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion4, tBox = txtOp4 }
-            };//, rBtnOpcion2, rBtnOpcion3, rBtnOpcion4 };
+            };
             try
             {
                 cnxSqlite = this.conexion_sqlite.OpenAndReturn();
                 sqlCmd = this.conexion_sqlite.CreateCommand();
 
                 //TODO: Validar el tipo de pregunta: Texto, Video, Ecuaciones, otros
-                strInsertarCuestionario = "INSERT INTO tblCuestionario(" +
-                    "    txtPregunta," +
-                    "    txtVideo," +
-                    "    txtEcuaciones," +
-                    "    txtOtros," +
-                    "    txtCorrecta," +
-                    "    intIdCategoria," +
-                    "    intIdOlimpiada" +
-                    ") VALUES(" +
-                    "    '{0}'," +
-                    "    null," +
-                    "    null," +
-                    "    null," +
-                    "    '{1}'," +
-                    "    {2}," +
-                    "    {3}" +
-                    ");" +
-                    "SELECT last_insert_rowid();";
-                strInsertarRespuestasErr = "INSERT INTO tblRepuestaErronea(" +
-                    "intID," +
-                    "txtRespuesta1," +
-                    "txtRespuesta2," +
-                    "txtRespuesta3" +
-                    ")VALUES(" +
-                    "{0},'{1}','{2}','{3}');";
-
+                strInsertarCuestionario = Properties.Resources.ScriptInsertaPregunta;
                 strPregunta = this.txtPregunta.Text;
                 if (strPregunta == null)
                     return;//TODO: trow exception
                 if (strPregunta.Length <= 0)
                     return;//TODO: trow exception
 
-                if (cbCategoria.SelectedIndex > 0)
+                if (cbCategoria.SelectedIndex > -1)
+                {
                     intCat = ((Int32)cbCategoria.SelectedValue);
-                if (cbOlimpiada.SelectedIndex > 0)
+                }
+                else
+                {
+                    throw new Exception("No se ha seleccionado una categoría");
+                }
+                if (cbOlimpiada.SelectedIndex > -1)
+                {
                     intOlimpiada = ((Int32)cbOlimpiada.SelectedValue);
+                }
+                else
+                {
+                    throw new Exception("No se ha seleccionado una olimpiada");
+                }
 
                 foreach (ConjuntoRBtnTBox elm in conjunto)
                 {
@@ -303,7 +359,7 @@ namespace EditorOlimpiadas
                     }
                 }
 
-                strInsertarCuestionario = String.Format(strInsertarCuestionario, strPregunta, strRespuestaOK, intCat, intOlimpiada);
+                strInsertarCuestionario = String.Format(strInsertarCuestionario, strPregunta, strRespuestaOK, intCat, intOlimpiada, strRespuestaErr.ElementAt(0), strRespuestaErr.ElementAt(1), strRespuestaErr.ElementAt(2));
                 sqlCmd.CommandText = strInsertarCuestionario;
                 reader = sqlCmd.ExecuteReader();
                 cuestionId = -1;
@@ -311,18 +367,15 @@ namespace EditorOlimpiadas
                 {
                     cuestionId = reader.GetInt32(0);
                 }
-                reader.Close();
-                if(cuestionId >= 0)
+            }
+            catch (SQLiteException ex)
+            {
+                if (sqlCmd != null)
                 {
-                    strInsertarRespuestasErr = String.Format(strInsertarRespuestasErr, cuestionId, strRespuestaErr.ElementAt(0), strRespuestaErr.ElementAt(1), strRespuestaErr.ElementAt(2));
-                    sqlCmd.CommandText = strInsertarCuestionario;
-                    reader = sqlCmd.ExecuteReader();
-                    if(reader.RecordsAffected < 1)
-                    {
-                        //TODO: error en la insercion de las respuestas erroneas.
-                    }
-                    reader.Close();
+                    sqlCmd.CommandText = "ROLLBACK;";
+                    sqlCmd.ExecuteNonQuery();
                 }
+                new Exception(ex.Message, ex);
             }
             catch (Exception exc)
             {
@@ -340,7 +393,8 @@ namespace EditorOlimpiadas
 
         private void btAgregarOlimpiada_Click(object sender, EventArgs e)
         {
-            insertarNombre(strTblOlimpiada, tbAgregarOlimpiada.Text);
+            string txtOlimpiada = tbAgregarOlimpiada.Text;
+            insertarNombre(strTblOlimpiada, txtOlimpiada);
             llenarComboBox(cbOlimpiada, strTblOlimpiada);
             tbAgregarOlimpiada.Text = "";
         }
@@ -356,7 +410,7 @@ namespace EditorOlimpiadas
             SQLiteConnection cnxSqlite = null;
             try
             {
-                String strQuery = String.Format("INSERT INTO {0}(txtNombre) VALUES('{1}');", strTabla, strTexto);
+                String strQuery = String.Format("INSERT INTO {0} (txtNombre) VALUES('{1}');", strTabla, strTexto);
                 cnxSqlite = conexion_sqlite.OpenAndReturn();
                 SQLiteCommand cmdSqlite = cnxSqlite.CreateCommand();
                 cmdSqlite.CommandText = strQuery;
@@ -408,46 +462,32 @@ namespace EditorOlimpiadas
                     cnxSqlite.Close();
             }
         }
-    }
-    public class Nombre
-    {
-        public string texto { get; set; }
-        public Int32 id { get; set; }
+        public class Nombre
+        {
+            public string texto { get; set; }
+            public Int32 id { get; set; }
+        }
+        private void DesActivarEdicion()
+        {
+            foreach (Control tmp in activarDesactivarControles)
+            {
+                tmp.Enabled = false;
+            }
+            foreach (ToolStripItem tmp in activarDesactivarToolStripItems)
+            {
+                tmp.Enabled = false;
+            }
+        }
+        private void ActivarEdicion()
+        {
+            foreach (Control tmp in activarDesactivarControles)
+            {
+                tmp.Enabled = true;
+            }
+            foreach (ToolStripItem tmp in activarDesactivarToolStripItems)
+            {
+                tmp.Enabled = true;
+            }
+        }
     }
 }
-
-/*
-INSERT INTO tblOlimpiada(txtNombre) VALUES ('2018-2');
-INSERT INTO tblCategoria(txtNombre) VALUES ('Cat1');
-
-INSERT INTO tblCuestionario( 
-	txtPregunta,
-	txtVideo,
-	txtEcuaciones,
-	txtOtros,
-	txtCorrecta,
-	intIdCategoria,
-	intIdOlimpiada
-) VALUES (
-	'{0}',
-	null,
-	null,
-	null,
-	'{1}',
-	{2},
-	{3}
-);
-SELECT last_insert_rowid();
-
-INSERT INTO tblRepuestaErronea(
-	intID,
-	txtRespuesta1,
-	txtRespuesta2,
-	txtRespuesta3
-)VALUES(
-    {0},
-    {1},
-    {2},
-    {3}
-);
-*/

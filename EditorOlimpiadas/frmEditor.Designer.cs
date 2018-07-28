@@ -678,6 +678,7 @@
             // 
             // txtOp4
             // 
+            this.txtOp4.Enabled = false;
             this.txtOp4.Location = new System.Drawing.Point(45, 184);
             this.txtOp4.Multiline = true;
             this.txtOp4.Name = "txtOp4";
@@ -686,6 +687,7 @@
             // 
             // txtOp1
             // 
+            this.txtOp1.Enabled = false;
             this.txtOp1.Location = new System.Drawing.Point(45, 20);
             this.txtOp1.Multiline = true;
             this.txtOp1.Name = "txtOp1";
@@ -694,6 +696,7 @@
             // 
             // txtOp2
             // 
+            this.txtOp2.Enabled = false;
             this.txtOp2.Location = new System.Drawing.Point(44, 74);
             this.txtOp2.Multiline = true;
             this.txtOp2.Name = "txtOp2";
@@ -702,6 +705,7 @@
             // 
             // txtOp3
             // 
+            this.txtOp3.Enabled = false;
             this.txtOp3.Location = new System.Drawing.Point(44, 129);
             this.txtOp3.Multiline = true;
             this.txtOp3.Name = "txtOp3";
@@ -711,6 +715,7 @@
             // txtPregunta
             // 
             this.txtPregunta.Anchor = System.Windows.Forms.AnchorStyles.Top;
+            this.txtPregunta.Enabled = false;
             this.txtPregunta.Location = new System.Drawing.Point(3, 15);
             this.txtPregunta.Multiline = true;
             this.txtPregunta.Name = "txtPregunta";
@@ -764,6 +769,7 @@
             // btnCloseDB
             // 
             this.btnCloseDB.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnCloseDB.Enabled = false;
             this.btnCloseDB.Image = ((System.Drawing.Image)(resources.GetObject("btnCloseDB.Image")));
             this.btnCloseDB.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnCloseDB.Name = "btnCloseDB";
@@ -778,6 +784,7 @@
             // btnNewQ
             // 
             this.btnNewQ.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnNewQ.Enabled = false;
             this.btnNewQ.Image = ((System.Drawing.Image)(resources.GetObject("btnNewQ.Image")));
             this.btnNewQ.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnNewQ.Name = "btnNewQ";
@@ -787,6 +794,7 @@
             // btnSave
             // 
             this.btnSave.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnSave.Enabled = false;
             this.btnSave.Image = ((System.Drawing.Image)(resources.GetObject("btnSave.Image")));
             this.btnSave.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnSave.Name = "btnSave";
@@ -797,6 +805,7 @@
             // btnDelQ
             // 
             this.btnDelQ.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnDelQ.Enabled = false;
             this.btnDelQ.Image = ((System.Drawing.Image)(resources.GetObject("btnDelQ.Image")));
             this.btnDelQ.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnDelQ.Name = "btnDelQ";
@@ -816,6 +825,7 @@
             // btnFirst
             // 
             this.btnFirst.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnFirst.Enabled = false;
             this.btnFirst.Image = ((System.Drawing.Image)(resources.GetObject("btnFirst.Image")));
             this.btnFirst.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnFirst.Name = "btnFirst";
@@ -825,6 +835,7 @@
             // btnBack
             // 
             this.btnBack.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnBack.Enabled = false;
             this.btnBack.Image = ((System.Drawing.Image)(resources.GetObject("btnBack.Image")));
             this.btnBack.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnBack.Name = "btnBack";
@@ -834,6 +845,7 @@
             // btnNext
             // 
             this.btnNext.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnNext.Enabled = false;
             this.btnNext.Image = ((System.Drawing.Image)(resources.GetObject("btnNext.Image")));
             this.btnNext.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnNext.Name = "btnNext";
@@ -843,6 +855,7 @@
             // btnLast
             // 
             this.btnLast.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
+            this.btnLast.Enabled = false;
             this.btnLast.Image = ((System.Drawing.Image)(resources.GetObject("btnLast.Image")));
             this.btnLast.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.btnLast.Name = "btnLast";
@@ -946,6 +959,7 @@
             // 
             // tbAgregarOlimpiada
             // 
+            this.tbAgregarOlimpiada.Enabled = false;
             this.tbAgregarOlimpiada.Location = new System.Drawing.Point(58, 46);
             this.tbAgregarOlimpiada.Name = "tbAgregarOlimpiada";
             this.tbAgregarOlimpiada.Size = new System.Drawing.Size(116, 20);
@@ -993,6 +1007,7 @@
             // 
             // tbAgregarCategoria
             // 
+            this.tbAgregarCategoria.Enabled = false;
             this.tbAgregarCategoria.Location = new System.Drawing.Point(56, 46);
             this.tbAgregarCategoria.Name = "tbAgregarCategoria";
             this.tbAgregarCategoria.Size = new System.Drawing.Size(118, 20);
