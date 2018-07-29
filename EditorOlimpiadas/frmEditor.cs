@@ -38,11 +38,14 @@ namespace EditorOlimpiadas
         //public SQLiteConnection conexion_sqlite { get; private set; }
         private void SetConnection(String filePath)
         {
+            /*
             ArrayList tablas = new ArrayList();
             tablas.Add(strTblOlimpiada);
             tablas.Add(strTblCategoria);
             tablas.Add(strTblCuestionario);
             tablas.Add(strTblRespuestaErronea);
+            */
+            
 
             String conString = String.Format("Data Source={0};Version=3;New=False;Compress=True;", filePath);
             try
@@ -58,30 +61,6 @@ namespace EditorOlimpiadas
             {
                 MessageBox.Show(e.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-        }
-
-        private void cargarPrimeraPregunta()
-        {
-            string query = "SELECT * FROM viewCuestionario LIMIT 1;";
-            SQLiteConnection cnxSqlite = conexion_sqlite.OpenAndReturn();
-            SQLiteCommand cmdSqlite = cnxSqlite.CreateCommand();
-            cmdSqlite.CommandText = query;
-            SQLiteDataReader reader = cmdSqlite.ExecuteReader();
-            if (reader.Read())
-            {
-                cuestionId = reader.GetInt32(0);
-                this.txtPregunta.Text = reader.GetString(4);
-                this.txtOp1.Text = reader.GetString(1);
-                this.txtOp2.Text = reader.GetString(6);
-                this.txtOp3.Text = reader.GetString(7);
-                this.txtOp4.Text = reader.GetString(8);
-            }
-            else
-            {
-                //TODO: No hay registros en la Base de datos
-            }
-            reader.Close();
-            cnxSqlite.Close();
         }
 
         public frmEditor()
@@ -209,11 +188,11 @@ namespace EditorOlimpiadas
                     cmd_sqlite.CommandText = "ROLLBACK;";
                     cmd_sqlite.ExecuteNonQuery();
                 }
-                new Exception(ex.Message,ex);
+                MessageBox.Show(ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception e)
             {
-                MessageBox.Show(e.Message);
+                MessageBox.Show(e.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
         }
@@ -317,13 +296,13 @@ namespace EditorOlimpiadas
                 new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion3, tBox = txtOp3 },
                 new ConjuntoRBtnTBox(){ rBtn = rBtnOpcion4, tBox = txtOp4 }
             };
+
             try
             {
                 cnxSqlite = this.conexion_sqlite.OpenAndReturn();
                 sqlCmd = this.conexion_sqlite.CreateCommand();
 
                 //TODO: Validar el tipo de pregunta: Texto, Video, Ecuaciones, otros
-                strInsertarCuestionario = Properties.Resources.ScriptInsertaPregunta;
                 strPregunta = this.txtPregunta.Text;
                 if (strPregunta == null)
                     return;//TODO: trow exception
@@ -359,7 +338,19 @@ namespace EditorOlimpiadas
                     }
                 }
 
-                strInsertarCuestionario = String.Format(strInsertarCuestionario, strPregunta, strRespuestaOK, intCat, intOlimpiada, strRespuestaErr.ElementAt(0), strRespuestaErr.ElementAt(1), strRespuestaErr.ElementAt(2));
+                if (cuestionId != -1)
+                {
+                    //strInsertarCuestionario = Properties.Resources.;
+                    strInsertarCuestionario = Properties.Resources.ScriptUpdatePregunta;
+                    strInsertarCuestionario = String.Format(strInsertarCuestionario, strPregunta, strRespuestaOK, intCat, intOlimpiada, strRespuestaErr.ElementAt(0), strRespuestaErr.ElementAt(1), strRespuestaErr.ElementAt(2),cuestionId);
+                }
+                else
+                {
+                    strInsertarCuestionario = Properties.Resources.ScriptInsertaPregunta;
+                    strInsertarCuestionario = String.Format(strInsertarCuestionario, strPregunta, strRespuestaOK, intCat, intOlimpiada, strRespuestaErr.ElementAt(0), strRespuestaErr.ElementAt(1), strRespuestaErr.ElementAt(2));
+                }
+
+
                 sqlCmd.CommandText = strInsertarCuestionario;
                 reader = sqlCmd.ExecuteReader();
                 cuestionId = -1;
@@ -375,7 +366,7 @@ namespace EditorOlimpiadas
                     sqlCmd.CommandText = "ROLLBACK;";
                     sqlCmd.ExecuteNonQuery();
                 }
-                new Exception(ex.Message, ex);
+                MessageBox.Show(ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (Exception exc)
             {
@@ -488,6 +479,134 @@ namespace EditorOlimpiadas
             {
                 tmp.Enabled = true;
             }
+        }
+
+        private void btnNext_Click(object sender, EventArgs e)
+        {
+            cargarSiguientePregunta();
+        }
+
+        private void cargarUltimaPregunta()
+        {
+            string query = "SELECT * FROM viewCuestionario ORDER BY IntId DESC LIMIT 1;";
+            cargarPregunta(query);
+        }
+
+        private void cargarPrimeraPregunta()
+        {
+            string query = "SELECT * FROM viewCuestionario ORDER BY IntId ASC LIMIT 1;";
+            cargarPregunta(query);
+        }
+
+        private void cargarSiguientePregunta()
+        {
+            string query = "SELECT * FROM viewCuestionario WHERE IntId > {0} ORDER BY IntId ASC LIMIT 1;";
+            query = String.Format(query, cuestionId);
+            cargarPregunta(query);
+        }
+
+        private void cargarAnteriorPregunta()
+        {
+            string query = "SELECT * FROM viewCuestionario WHERE IntId < {0} ORDER BY IntId DESC LIMIT 1;";
+            query = String.Format(query, cuestionId);
+            cargarPregunta(query);
+        }
+
+        private void cargarPregunta(string query)
+        {
+            SQLiteConnection cnxSqlite = null;
+            SQLiteCommand cmdSqlite = null;
+            try
+            {
+                cnxSqlite = conexion_sqlite.OpenAndReturn();
+                cmdSqlite = cnxSqlite.CreateCommand();
+                cmdSqlite.CommandText = query;
+                SQLiteDataReader reader = cmdSqlite.ExecuteReader();
+                if (reader.Read())
+                {
+                    cuestionId = reader.GetInt32(0);
+                    this.txtPregunta.Text = reader.GetString(4);
+                    this.rBtnOpcion1.Checked = true;
+                    this.txtOp1.Text = reader.GetString(1);
+                    this.txtOp2.Text = reader.GetString(6);
+                    this.txtOp3.Text = reader.GetString(7);
+                    this.txtOp4.Text = reader.GetString(8);
+                }
+                else
+                {
+                    //TODO: No hay registros en la Base de datos
+                }
+                reader.Close();
+            }
+            catch (SQLiteException ex)
+            {
+                if(cmdSqlite != null)
+                {
+                    cmdSqlite.CommandText = "ROLLBACK;";
+                    cmdSqlite.ExecuteNonQuery();
+                }
+                MessageBox.Show(ex.Message, "ERROR", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                //reader.Close();
+                if (cnxSqlite != null)
+                    cnxSqlite.Close();
+
+            }
+        }
+
+        private void btnLast_Click(object sender, EventArgs e)
+        {
+            cargarUltimaPregunta();
+        }
+
+        private void btnBack_Click(object sender, EventArgs e)
+        {
+            cargarAnteriorPregunta();
+        }
+
+        private void btnFirst_Click(object sender, EventArgs e)
+        {
+            cargarPrimeraPregunta();
+        }
+
+        private void btnDelQ_Click(object sender, EventArgs e)
+        {
+            borrarPreguntaActual();
+        }
+        private void borrarPreguntaActual()
+        {
+            String query = "BEGIN TRANSACTION;" +
+                "DELETE FROM " + strTblRespuestaErronea + " WHERE IntId = {0};" +
+                "DELETE FROM " + strTblCuestionario + " WHERE IntId = {0};" +
+                "COMMIT;" +
+                "SELECT * FROM viewCuestionario WHERE IntId < {0} ORDER BY IntId DESC LIMIT 1;";
+            query = String.Format(query, cuestionId);
+            cargarPregunta(query);
+        }
+
+        private void btnNewQ_Click(object sender, EventArgs e)
+        {
+            limpiarFormulario();
+        }
+        private void limpiarFormulario()
+        {
+            cuestionId = -1;
+            this.txtPregunta.Text = "";
+            this.txtOp1.Text = "";
+            this.txtOp2.Text = "";
+            this.txtOp3.Text = "";
+            this.txtOp4.Text = "";
+            this.cbCategoria.DataSource = null;
+            this.cbOlimpiada.DataSource = null;
+        }
+
+        private void btnCloseDB_Click(object sender, EventArgs e)
+        {
+            this.conexion_sqlite = null;
+            limpiarFormulario();
+            DesActivarEdicion();
         }
     }
 }

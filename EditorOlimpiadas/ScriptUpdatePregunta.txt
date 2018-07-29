@@ -1,0 +1,11 @@
+PRAGMA foreign_keys = ON;
+BEGIN TRANSACTION;
+  UPDATE tblCuestionario
+    SET txtPregunta='{0}', txtVideo=null, txtEcuaciones=null, txtOtros=null, txtCorrecta='{1}', intIdCategoria={2}, intIdOlimpiada={3}
+    WHERE IntId = {7};
+  UPDATE tblRespuestaErronea
+    SET txtRespuesta1='{4}', txtRespuesta2='{5}', txtRespuesta3='{6}'
+	WHERE IntId = {7};
+COMMIT TRANSACTION;
+--SELECT * FROM viewCuestionario WHERE IntId < last_insert_rowid();
+SELECT {7};

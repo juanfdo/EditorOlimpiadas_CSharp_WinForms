@@ -32,7 +32,6 @@ D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\bin\Debug\EntityFramework.xml
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\bin\Debug\EntityFramework.SqlServer.xml
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\bin\Debug\System.Data.SQLite.xml
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\bin\Debug\System.Data.SQLite.dll.config
-D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.csprojAssemblyReference.cache
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.frmcredits.resources
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.frmEditor.resources
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.Properties.Resources.resources
@@ -41,3 +40,4 @@ D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.csproj
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.csproj.CopyComplete
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.exe
 D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.pdb
+D:\proyectosGitHub\olimpiadas\EditorOlimpiadas\obj\Debug\EditorOlimpiadas.csprojAssemblyReference.cache

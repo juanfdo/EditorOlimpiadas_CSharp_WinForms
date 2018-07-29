@@ -775,6 +775,7 @@
             this.btnCloseDB.Name = "btnCloseDB";
             this.btnCloseDB.Size = new System.Drawing.Size(24, 24);
             this.btnCloseDB.Text = "Cerrar Base de Datos";
+            this.btnCloseDB.Click += new System.EventHandler(this.btnCloseDB_Click);
             // 
             // toolStripSeparator1
             // 
@@ -790,6 +791,7 @@
             this.btnNewQ.Name = "btnNewQ";
             this.btnNewQ.Size = new System.Drawing.Size(24, 24);
             this.btnNewQ.Text = "Nueva Pregunta";
+            this.btnNewQ.Click += new System.EventHandler(this.btnNewQ_Click);
             // 
             // btnSave
             // 
@@ -811,6 +813,7 @@
             this.btnDelQ.Name = "btnDelQ";
             this.btnDelQ.Size = new System.Drawing.Size(24, 24);
             this.btnDelQ.Text = "Borrar Pregunta";
+            this.btnDelQ.Click += new System.EventHandler(this.btnDelQ_Click);
             // 
             // toolStripSeparator2
             // 
@@ -831,6 +834,7 @@
             this.btnFirst.Name = "btnFirst";
             this.btnFirst.Size = new System.Drawing.Size(24, 24);
             this.btnFirst.Text = "Primera pregunta";
+            this.btnFirst.Click += new System.EventHandler(this.btnFirst_Click);
             // 
             // btnBack
             // 
@@ -841,6 +845,7 @@
             this.btnBack.Name = "btnBack";
             this.btnBack.Size = new System.Drawing.Size(24, 24);
             this.btnBack.Text = "Anterior pregunta";
+            this.btnBack.Click += new System.EventHandler(this.btnBack_Click);
             // 
             // btnNext
             // 
@@ -851,6 +856,7 @@
             this.btnNext.Name = "btnNext";
             this.btnNext.Size = new System.Drawing.Size(24, 24);
             this.btnNext.Text = "Siguiente pregunta";
+            this.btnNext.Click += new System.EventHandler(this.btnNext_Click);
             // 
             // btnLast
             // 
@@ -861,6 +867,7 @@
             this.btnLast.Name = "btnLast";
             this.btnLast.Size = new System.Drawing.Size(24, 24);
             this.btnLast.Text = "Última pregunta";
+            this.btnLast.Click += new System.EventHandler(this.btnLast_Click);
             // 
             // openFileDialog1
             // 

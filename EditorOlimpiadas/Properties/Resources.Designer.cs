@@ -91,24 +91,23 @@ namespace EditorOlimpiadas.Properties {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a CREATE TABLE tblOlimpiada(
-        ///	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        ///	txtNombre TEXT NOT NULL UNIQUE
-        ///);
+        ///   Busca una cadena traducida similar a BEGIN TRANSACTION;
+        ///PRAGMA foreign_keys = OFF;
         ///
-        ///CREATE TABLE tblCategoria(
-        ///	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        ///CREATE TABLE tblUsuario(
+        ///	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
         ///	txtNombre TEXT NOT NULL UNIQUE
+        ///--	intRol INTEGER NOT NULL DEFAULT 1 REFERENCES rol(intId),
+        ///--	txtPassword TEXT NOT NULL
         ///);
+        ///INSERT INTO tblUsuario(intId, txtNombre) VALUES (1, &apos;root&apos;);
         ///
-        ///-- https://www.sqlite.org/intern-v-extern-blob.html
-        ///-- CREATE TABLE tblMediaFile(
-        ///-- 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-        ///-- 	pathRelativo BOOLEAN NOT NULL DEFAULT 1,
-        ///-- 	web BOOLEAN NOT NULL DEFAULT 0,
-        ///-- 	path NVARCHAR NOT NULL UNIQUE
-        ///-- 	);
-        ///-- https: [resto de la cadena truncado]&quot;;.
+        ///CREATE TABLE tblConfiguracion(
+        ///	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+        ///	txtKey TEXT NOT NULL UNIQUE,
+        ///	txtValue TEXT NOT NULL,
+        ///	txtDescripcion TEXT NOY NULL,
+        ///	txtCreatedAt DATET [resto de la cadena truncado]&quot;;.
         /// </summary>
         internal static string ScriptCreateTables {
             get {
@@ -117,17 +116,34 @@ namespace EditorOlimpiadas.Properties {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a INSERT INTO tblCuestionario(txtPregunta, txtVideo, txtEcuaciones, txtOtros, txtCorrecta, intIdCategoria, intIdOlimpiada)
-        ///  VALUES(&apos;{0}&apos;, null, null, null, &apos;{1}&apos;, {2}, {3});
-        ///--  SELECT last_insert_rowid();
-        ///INSERT INTO tblRepuestaErronea(intID, txtRespuesta1, txtRespuesta2, txtRespuesta3)
-        ///  SELECT last_insert_rowid(), &apos;{4}&apos;, &apos;{5}&apos;, &apos;{6}&apos;;
-        ///
-        ///--  VALUES({0},&apos;{1}&apos;,&apos;{2}&apos;,&apos;{3}&apos;);.
+        ///   Busca una cadena traducida similar a PRAGMA foreign_keys = ON;
+        ///BEGIN TRANSACTION;
+        ///  INSERT INTO tblCuestionario(txtPregunta, txtVideo, txtEcuaciones, txtOtros, txtCorrecta, intIdCategoria, intIdOlimpiada) VALUES(&apos;{0}&apos;, null, null, null, &apos;{1}&apos;, {2}, {3});
+        ///  INSERT INTO tblRespuestaErronea(intID, txtRespuesta1, txtRespuesta2, txtRespuesta3) SELECT last_insert_rowid(), &apos;{4}&apos;, &apos;{5}&apos;, &apos;{6}&apos;;
+        ///COMMIT TRANSACTION;
+        ///SELECT last_insert_rowid();.
         /// </summary>
         internal static string ScriptInsertaPregunta {
             get {
                 return ResourceManager.GetString("ScriptInsertaPregunta", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Busca una cadena traducida similar a PRAGMA foreign_keys = ON;
+        ///BEGIN TRANSACTION;
+        ///  UPDATE tblCuestionario
+        ///    SET txtPregunta=&apos;{0}&apos;, txtVideo=null, txtEcuaciones=null, txtOtros=null, txtCorrecta=&apos;{1}&apos;, intIdCategoria={2}, intIdOlimpiada={3}
+        ///    WHERE IntId = {7};
+        ///  UPDATE tblRespuestaErronea
+        ///    SET txtRespuesta1=&apos;{4}&apos;, txtRespuesta2=&apos;{5}&apos;, txtRespuesta3=&apos;{6}&apos;
+        ///	WHERE IntId = {7};
+        ///COMMIT TRANSACTION;
+        ///SELECT last_insert_rowid();.
+        /// </summary>
+        internal static string ScriptUpdatePregunta {
+            get {
+                return ResourceManager.GetString("ScriptUpdatePregunta", resourceCulture);
             }
         }
     }
