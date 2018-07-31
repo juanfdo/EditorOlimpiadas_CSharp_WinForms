@@ -20,14 +20,14 @@ CREATE TABLE tblConfiguracion(
 INSERT INTO tblConfiguracion(txtKey,txtValue,txtDescripcion)values('ver','0.0.1','Version de la base de datos');
 
 CREATE TABLE tblOlimpiada(
-	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	txtNombre TEXT NOT NULL UNIQUE,
 	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
 	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
 );
 
 CREATE TABLE tblCategoria(
-	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	txtNombre TEXT NOT NULL UNIQUE,
 	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
 	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
@@ -35,7 +35,7 @@ CREATE TABLE tblCategoria(
 
 -- https://www.sqlite.org/intern-v-extern-blob.html
 -- CREATE TABLE tblMediaFile(
--- 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+-- 	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 -- 	pathRelativo BOOLEAN NOT NULL DEFAULT 1,
 -- 	web BOOLEAN NOT NULL DEFAULT 0,
 -- 	path NVARCHAR NOT NULL UNIQUE,
@@ -44,14 +44,14 @@ CREATE TABLE tblCategoria(
 -- 	);
 -- https://www.sqlite.org/intern-v-extern-blob.html
 -- CREATE TABLE tblMediaBLOB(
--- 	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+-- 	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 -- 	data BLOB NOT NULL,
 --	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
 --	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId)
 -- );
 
 CREATE TABLE tblCuestionario( 
-	intID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+	intId INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
 	txtPregunta TEXT NULL,
 	txtVideo NVARCHAR NULL,
 	txtEcuaciones NVARCHAR NULL,
@@ -62,23 +62,23 @@ CREATE TABLE tblCuestionario(
 	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
 	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId),
 --	CHECK ((txtPregunta is not null) or (txtVideo is not null) or (txtEcuaciones is not null) or (txtOtros is not null) ),
-	FOREIGN KEY(intIdCategoria) REFERENCES tblCategoria(intID)
-	FOREIGN KEY(intIdOlimpiada) REFERENCES tblOlimpiada(intID)
+	FOREIGN KEY(intIdCategoria) REFERENCES tblCategoria(intId)
+	FOREIGN KEY(intIdOlimpiada) REFERENCES tblOlimpiada(intId)
 );
 
 
 CREATE TABLE tblRespuestaErronea(
-	intID INTEGER NOT NULL PRIMARY KEY,
+	intId INTEGER NOT NULL PRIMARY KEY,
 	txtRespuesta1 TEXT NOT NULL,
 	txtRespuesta2 TEXT NOT NULL,
 	txtRespuesta3 TEXT NOT NULL,
 	txtCreatedAt DATETIME DEFAULT CURRENT_TIMESTAMP,
 	txtCreatedBy INTEGER NOT NULL DEFAULT 1 REFERENCES tblUsuario(intId),
-	FOREIGN KEY(intID) REFERENCES tblCuestionario(intID)
+	FOREIGN KEY(intId) REFERENCES tblCuestionario(intId)
 );
 
 CREATE VIEW IF NOT EXISTS viewCuestionario AS
-SELECT tblCuestionario.intID as intID,
+SELECT tblCuestionario.intId as intId,
   tblCuestionario.txtCorrecta as txtCorrecta,
   tblCuestionario.txtEcuaciones as txtEcuaciones,
   tblCuestionario.txtOtros as txtOtros,
@@ -91,7 +91,7 @@ FROM
   tblCuestionario,
   tblRespuestaErronea
 where
-  tblCuestionario.intID == tblRespuestaErronea.intID;
+  tblCuestionario.intId == tblRespuestaErronea.intId;
 
 PRAGMA foreign_keys = ON;
 COMMIT;

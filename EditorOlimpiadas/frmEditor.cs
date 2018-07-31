@@ -588,9 +588,9 @@ namespace EditorOlimpiadas
 
         private void btnNewQ_Click(object sender, EventArgs e)
         {
-            limpiarFormulario();
+            limpiarFormulario(false);
         }
-        private void limpiarFormulario()
+        private void limpiarFormulario(bool limpiaComboBoxes = true)
         {
             cuestionId = -1;
             this.txtPregunta.Text = "";
@@ -598,8 +598,10 @@ namespace EditorOlimpiadas
             this.txtOp2.Text = "";
             this.txtOp3.Text = "";
             this.txtOp4.Text = "";
-            this.cbCategoria.DataSource = null;
-            this.cbOlimpiada.DataSource = null;
+            if (limpiaComboBoxes) { 
+                this.cbCategoria.DataSource = null;
+                this.cbOlimpiada.DataSource = null;
+            }
         }
 
         private void btnCloseDB_Click(object sender, EventArgs e)
